@@ -23,8 +23,10 @@ namespace LcmAPI
 
                 if (!long.TryParse(xVal, out long x) ||
                     !long.TryParse(yVal, out long y) ||
-                    x <= 0 || y <= 0)
+                    x < 0 || y < 0)
                     return "NaN";
+                if (x == 0 || y == 0)
+                    return "0";
 
                 long Gcd(long a, long b)
                 {
