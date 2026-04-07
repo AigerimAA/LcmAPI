@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Primitives;
+using System.Numerics;
 
 namespace LcmAPI
 {
@@ -13,36 +14,21 @@ namespace LcmAPI
 
             var app = builder.Build();
 
-            app.MapGet("/aigerim_10803_gmail_com", (HttpContext context) =>
+            app.MapGet("/aigerim_10803_gmail_com", (string? x, string? y) =>
             {
-                var query = context.Request.Query;
-
-                if (!query.TryGetValue("x", out StringValues xVal) ||
-                    !query.TryGetValue("y", out StringValues yVal))
-                    return "NaN";
-
-                if (!long.TryParse(xVal, out long x) ||
-                    !long.TryParse(yVal, out long y) ||
-                    x < 0 || y < 0)
-                    return "NaN";
-                if (x == 0 || y == 0)
-                    return "0";
-
-                long Gcd(long a, long b)
+                if (!BigInteger.TryParse(x, out BigInteger b1) || 
+                    !BigInteger.TryParse(y, out BigInteger b2) || 
+                    b1 < 0 || b2 < 0)
                 {
-                    while (b != 0)
-                    {
-                        var t = b;
-                        b = a % b;
-                        a = t;
-                    }
-                    return a;
+                    return Results.Text("NaN", "text/plain");
                 }
-
-                var gcd = Gcd(x, y);
-                var lcm = (x / gcd) * y;
-
-                return lcm.ToString();
+            
+                if (b1 == 0 || b2 == 0) return Results.Text("0", "text/plain");
+            
+                BigInteger gcd = BigInteger.GreatestCommonDivisor(b1, b2);
+                BigInteger lcm = BigInteger.Abs(b1 * b2) / gcd;
+            
+                return Results.Text(lcm.ToString(), "text/plain");
             });
 
             app.Run();
